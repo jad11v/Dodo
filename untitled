@@ -1,0 +1,154 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ */
+'use strict';
+
+
+var REQUEST_URL = 'https://maps.googleapis.com/maps/api/place/search/json?location=33.7167,73.0667&radius=500&type=restaurant&sensor=false&key=AIzaSyDN1QX-gWUR-mIYo_D21PNFLHHpNQkIkGU';
+
+var React = require('react-native');
+var {
+  AppRegistry,
+  Image, 
+  StyleSheet,
+  Text,
+  View,
+} = React;
+
+var testProject = React.createClass({
+
+  getInitialState: function() {
+    return {
+      results: null,
+    };
+  },
+
+componentDidMount: function(){
+  this.fetchData();
+},
+
+fetchData: function() {
+    fetch(REQUEST_URL)
+      .then((response) => response.json())
+      .then((responseData) => {
+        this.setState({
+          results: responseData.results,
+        });
+        console.log(responseData.results);
+      })
+      .done();
+  },
+
+
+render: function() {
+   return (
+    <View style={styles.outerContainer}>
+    <View style={styles.container}>
+    <Card results={this.state.results}/>
+    </View>
+    </View>
+  );
+
+  },
+
+});
+
+var Card = React.createClass({
+
+render: function(){
+  if(!this.props.results)
+    return this.renderLoadingView();
+   
+   var restaurant = this.props.results[0];
+   return this.renderPlace(restaurant);
+},
+
+renderLoadingView: function(){
+    return(
+      <View style={styles.container}>
+      <Text> Loading restaurant </Text>
+      </View>
+
+      );
+
+  },
+  
+renderPlace: function(place){
+    return(
+      <View style={styles.card}>
+        <Image 
+        source = {{uri: place.icon}} 
+        style = {styles.thumbnail}
+        />
+     <View style={styles.rightContainer}>
+     <Text style ={styles.title}> {place.name} </Text>
+     <Text style={styles.title}> {place.rating} </Text>
+     </View>
+    </View>
+    );
+},
+
+
+});
+
+
+
+var styles = StyleSheet.create({
+  
+  card:{
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    backgroundColor: 'white',
+    shadowColor: 'black',
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    shadowOffset: {
+      height: 0,
+      width: 0,
+    },
+    width: 290,
+    height: 290,
+
+  },
+  outerContainer:{
+    flex:1,
+    alignItems:'center',
+    justifyContent: 'center',
+    },
+
+
+  container: {
+  paddingBottom: 300,
+    //make the children of our main container lay out horizontally instead of vertically
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  rightContainer: {
+    //makes rightContainer take up the remaining space in the parent container that isnt taken up by the image.
+    //no flex would mean that 
+    flex: 1,
+    
+  },
+
+  thumbnail: {
+    width: 53,
+    height: 81,
+  },
+
+  title: {
+    fontSize: 20,
+    marginBottom: 40,
+    textAlign: 'center',
+
+  },
+
+  year: {
+    textAlign: 'center',
+  },
+
+});
+
+AppRegistry.registerComponent('dodo', () => testProject);
